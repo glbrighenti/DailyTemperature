@@ -6,7 +6,15 @@ public class DayInfo {
     private String name;
     private Float temperature;
     private Drawable image;
+    private boolean isCelsius;
 
+    public boolean getCelsius() {
+        return isCelsius;
+    }
+
+    public void setCelsius(boolean celsius) {
+        this.isCelsius = celsius;
+    }
 
     public Drawable getImage() {
         return image;

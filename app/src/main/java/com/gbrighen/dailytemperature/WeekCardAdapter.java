@@ -31,9 +31,8 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
     public void onBindViewHolder(WeekViewHolder holder, int position) {
         DayInfo dayInfo = daysInfoList.get(position);
         holder.mDayName.setText(dayInfo.getName());
-        ;
-
         holder.mDayTemperature.setText(String.format("%.1f", dayInfo.getTemperature()));
+        holder.mUnit.setText(getTempAbbreviation(dayInfo.getCelsius()));
         holder.mDayImage.setImageDrawable(dayInfo.getImage());
         //TODO holder.mUnit
     }
@@ -43,6 +42,10 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         return daysInfoList.size();
     }
 
+    public void updateData(ArrayList<DayInfo> al){
+        this.daysInfoList=al;
+        notifyDataSetChanged();
+    }
     public static class WeekViewHolder extends RecyclerView.ViewHolder {
 
         protected TextView mDayName;
@@ -56,6 +59,15 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
             mDayTemperature = (TextView)  v.findViewById(R.id.text_day_temp);
             mDayImage = (ImageView)  v.findViewById(R.id.image_day);
             mUnit = (TextView) v.findViewById(R.id.text_day_unit);
+        }
+    }
+
+    private String getTempAbbreviation(boolean isCelsius){
+        if(isCelsius) {
+            return "°C";
+        }
+        else{
+            return "°F";
         }
     }
 

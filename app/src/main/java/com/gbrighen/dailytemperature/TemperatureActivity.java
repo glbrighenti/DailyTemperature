@@ -9,13 +9,12 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -25,7 +24,9 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     static {
         System.loadLibrary("conversion_module");
     }
+
     private native float convertToCelsius(float t);
+
     private native float convertToFahrenheit(float t);
 
 
@@ -33,42 +34,40 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     private SensorManager sensorManager;
     private Sensor tempSensor;
     private float currentTemperature = 0;
-    private boolean isCelsius=true;
-    private TextView textUnit;
-
+    private boolean isCelsius = true;
+    private ArrayList<DayInfo> daysList;
+    private WeekCardAdapter cardAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temperature);
-        ArrayList<DayInfo> al=createList();
+        //populating fake data
+        daysList = createList();
+        //setup UI components
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.card_list);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-
-        WeekCardAdapter cardAdapter = new WeekCardAdapter(al);
+        cardAdapter = new WeekCardAdapter(daysList);
         recyclerView.setAdapter(cardAdapter);
-
-
-
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        tempSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
-
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Toggle betweetn celsius and fahrenheit
-                isCelsius=!isCelsius;
-
+                updateData();
             }
         });
+
+        //init sensor
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        tempSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+
     }
 
     /*
@@ -78,7 +77,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     public void onSensorChanged(SensorEvent sensorEvent) {
         currentTemperature = sensorEvent.values[0];
         String title = String.format(getResources().getString(R.string.label_current_temperature), currentTemperature);
-        getSupportActionBar().setTitle(title+getTempAbbreviation());
+        //getSupportActionBar().setTitle(title + getTempAbbreviation());
     }
 
     @Override
@@ -93,7 +92,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     @Override
     protected void onResume() {
         super.onResume();
-        isCelsius=isCelsiusSetting();
+        isCelsius = isCelsiusSetting();
         sensorManager.registerListener(this, tempSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -118,43 +117,73 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         prefs.edit().putBoolean(SETTINGS_TEMPERATURE, pref).commit();
     }
 
-    private String getTempAbbreviation(){
-        if(isCelsius) {
+    private String getTempAbbreviation() {
+        if (isCelsius) {
             return "°C";
-        }
-        else{
+        } else {
             return "°F";
         }
     }
 
-    private ArrayList<DayInfo> createList(){
+
+    private void updateData() {
+
+        if (isCelsius) {
+            for (DayInfo di : daysList) {
+                di.setCelsius(false);
+                di.setTemperature(convertToFahrenheit(di.getTemperature()));
+            }
+//            currentTemperature=convertToFahrenheit(currentTemperature);
+//            String title = String.format(getResources().getString(R.string.label_current_temperature), currentTemperature);
+//            getSupportActionBar().setTitle(title + getTempAbbreviation());
+        }
+        else {
+            for (DayInfo di : daysList) {
+                di.setCelsius(true);
+                di.setTemperature(convertToCelsius(di.getTemperature()));
+            }
+//            currentTemperature=convertToCelsius(currentTemperature);
+//            String title = String.format(getResources().getString(R.string.label_current_temperature), currentTemperature);
+//            getSupportActionBar().setTitle(title + getTempAbbreviation());
+        }
+        //Toggle betweetn celsius and fahrenheit
+        isCelsius=!isCelsius;
+        cardAdapter.updateData(daysList);
+
+    }
+
+
+    /*
+    Helper methods to fake the weather data
+     */
+    private ArrayList<DayInfo> createList() {
         ArrayList<DayInfo> al = new ArrayList<DayInfo>();
         String[] namesList = getResources().getStringArray(R.array.days_names_array);
         DayInfo day;
-        for(int i=0;i<5;i++) {
+        for (int i = 0; i < 5; i++) {
             day = new DayInfo();
             day.setName(namesList[i]);
             day.setTemperature(getRandomTemperature());
             day.setImage(getDrawable(getRandonImage()));
+            day.setCelsius(isCelsius);
             al.add(day);
         }
         return al;
     }
 
-    private float getRandomTemperature(){
+    private float getRandomTemperature() {
         Random rand = new Random();
-        float min = -20.0f;
+        float min = -20.0f; //using believable temperatures
         float max = 50.0f;
         float randonTemp = rand.nextFloat() * (max - min) + min;
         return randonTemp;
     }
 
-    private int getRandonImage(){
-
-        int max=5;
+    private int getRandonImage() {
+        int max = 2;
         Random rand = new Random();
         int randonTemp = rand.nextInt(max);
-        switch (randonTemp){
+        switch (randonTemp) {
             case 0:
                 return R.drawable.cloudy;
             case 1:
