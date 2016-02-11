@@ -6,7 +6,9 @@
     <string name="label_wednesday">Wednesday forecast:</string>
     <string name="label_thursday">Thursday forecast:</string>
     <string name="label_friday">Friday forecast:</string>
-    <string name="label_current_temperature">Current temperature:</string>
+    <string name="label_current_temperature">Ambient temperature: %.1f</string>
+    <string name="label_celsius">°C</string>
+    <string name="label_fahrenheit">°F</string>
 
 
 </resources>

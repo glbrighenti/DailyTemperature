@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gbrighen.dailytemperature">
 
+    <!--<uses-feature>android.hardware.sensor.</uses-feature>-->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
