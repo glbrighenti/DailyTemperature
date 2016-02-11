@@ -7,6 +7,12 @@
     android:fitsSystemWindows="true"
     tools:context="com.gbrighen.dailytemperature.TemperatureActivity">
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/card_list"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
@@ -32,7 +38,7 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_temperature" />
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

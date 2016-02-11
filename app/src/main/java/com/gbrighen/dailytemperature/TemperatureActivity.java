@@ -10,9 +10,14 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class TemperatureActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -34,9 +39,21 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temperature);
+        ArrayList<DayInfo> al=createList();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        textUnit=(TextView)findViewById(R.id.text_monday_unit);
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.card_list);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
+
+        WeekCardAdapter cardAdapter = new WeekCardAdapter(al);
+        recyclerView.setAdapter(cardAdapter);
+
+
+
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         tempSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
 
@@ -47,12 +64,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
             public void onClick(View view) {
                 //Toggle betweetn celsius and fahrenheit
                 isCelsius=!isCelsius;
-                if(isCelsius){
-                    textUnit.setText("a");
 
-                }else {
-                    textUnit.setText("b");
-                }
             }
         });
     }
@@ -111,5 +123,44 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         else{
             return "°F";
         }
+    }
+
+    private ArrayList<DayInfo> createList(){
+        ArrayList<DayInfo> al = new ArrayList<DayInfo>();
+        String[] namesList = getResources().getStringArray(R.array.days_names_array);
+        DayInfo day;
+        for(int i=0;i<5;i++) {
+            day = new DayInfo();
+            day.setName(namesList[i]);
+            day.setTemperature(getRandomTemperature());
+            day.setImage(getDrawable(getRandonImage()));
+            al.add(day);
+        }
+        return al;
+    }
+
+    private float getRandomTemperature(){
+        Random rand = new Random();
+        float min = -20.0f;
+        float max = 50.0f;
+        float randonTemp = rand.nextFloat() * (max - min) + min;
+        return randonTemp;
+    }
+
+    private int getRandonImage(){
+
+        int max=5;
+        Random rand = new Random();
+        int randonTemp = rand.nextInt(max);
+        switch (randonTemp){
+            case 0:
+                return R.drawable.cloudy;
+            case 1:
+                return R.drawable.sunny;
+            default:
+                return R.drawable.sunny;
+        }
+
+
     }
 }

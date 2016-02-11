@@ -9,6 +9,7 @@
     <string name="label_current_temperature">Ambient temperature: %.1f</string>
     <string name="label_celsius">°C</string>
     <string name="label_fahrenheit">°F</string>
+    <string name="label_temperature">%.1f</string>
 
 
 </resources>

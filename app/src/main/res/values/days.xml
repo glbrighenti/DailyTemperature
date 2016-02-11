@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="days_names_array">
+        <item>@string/label_monday</item>
+        <item>@string/label_tuesday</item>
+        <item>@string/label_wednesday</item>
+        <item>@string/label_thursday</item>
+        <item>@string/label_friday</item>
+    </string-array>
+</resources>
