@@ -46,6 +46,10 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         this.daysInfoList=al;
         notifyDataSetChanged();
     }
+
+    public void updateAmbientTemperature(float temp){
+
+    }
     public static class WeekViewHolder extends RecyclerView.ViewHolder {
 
         protected TextView mDayName;

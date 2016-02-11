@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">Daily Temperature</string>
     <string name="action_settings">Settings</string>
-    <string name="label_monday">Monday forecast:</string>
-    <string name="label_tuesday">Tuesday forecast:</string>
-    <string name="label_wednesday">Wednesday forecast:</string>
-    <string name="label_thursday">Thursday forecast:</string>
-    <string name="label_friday">Friday forecast:</string>
-    <string name="label_current_temperature">Ambient temperature: %.1f</string>
+    <string name="label_monday">Monday:</string>
+    <string name="label_tuesday">Tuesday:</string>
+    <string name="label_wednesday">Wednesday:</string>
+    <string name="label_thursday">Thursday:</string>
+    <string name="label_friday">Friday:</string>
+    <string name="label_current_temperature">Ambient temperature:</string>
     <string name="label_celsius">°C</string>
     <string name="label_fahrenheit">°F</string>
     <string name="label_temperature">%.1f</string>

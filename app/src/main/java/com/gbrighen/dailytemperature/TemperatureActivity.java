@@ -20,23 +20,21 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class TemperatureActivity extends AppCompatActivity implements SensorEventListener {
-
+    //Loading .so library that was compiled before using ndk-build
     static {
         System.loadLibrary("conversion_module");
     }
-
+    //native methods that are defined in the conversion module
     private native float convertToCelsius(float t);
-
     private native float convertToFahrenheit(float t);
-
-
-    private final String SETTINGS_TEMPERATURE = "celsius";
+    
     private SensorManager sensorManager;
     private Sensor tempSensor;
     private float currentTemperature = 0;
-    private boolean isCelsius = true;
+    private boolean isCelsius=true; //Since android provides temperature in Celsius this is the default preference.
     private ArrayList<DayInfo> daysList;
     private WeekCardAdapter cardAdapter;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +52,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         recyclerView.setLayoutManager(layoutManager);
         cardAdapter = new WeekCardAdapter(daysList);
         recyclerView.setAdapter(cardAdapter);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
 
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -75,9 +73,12 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
      */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        currentTemperature = sensorEvent.values[0];
-        String title = String.format(getResources().getString(R.string.label_current_temperature), currentTemperature);
-        //getSupportActionBar().setTitle(title + getTempAbbreviation());
+        currentTemperature = sensorEvent.values[0]; //this data will always come as Celsius
+        if(!isCelsius){
+            currentTemperature=convertToFahrenheit(currentTemperature);
+        }
+        daysList.get(0).setTemperature(currentTemperature);
+        cardAdapter.updateData(daysList);
     }
 
     @Override
@@ -92,64 +93,35 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     @Override
     protected void onResume() {
         super.onResume();
-        isCelsius = isCelsiusSetting();
         sensorManager.registerListener(this, tempSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        setCelsiusSettings(isCelsius);
         sensorManager.unregisterListener(this);
     }
 
-    /*
-    When user set temperature preference we need to save it so when he comes back we can keep the last used settings
-    For this simple preference SharedPreference is the best choice
-    */
-    private boolean isCelsiusSetting() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        return prefs.getBoolean(SETTINGS_TEMPERATURE, true);
-    }
-
-    private void setCelsiusSettings(boolean pref) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.edit().putBoolean(SETTINGS_TEMPERATURE, pref).commit();
-    }
-
-    private String getTempAbbreviation() {
-        if (isCelsius) {
-            return "°C";
-        } else {
-            return "°F";
-        }
-    }
 
 
     private void updateData() {
-
         if (isCelsius) {
+            fab.setImageDrawable(getDrawable(R.drawable.temp_fahrenheit));
             for (DayInfo di : daysList) {
                 di.setCelsius(false);
                 di.setTemperature(convertToFahrenheit(di.getTemperature()));
             }
-//            currentTemperature=convertToFahrenheit(currentTemperature);
-//            String title = String.format(getResources().getString(R.string.label_current_temperature), currentTemperature);
-//            getSupportActionBar().setTitle(title + getTempAbbreviation());
+            isCelsius=false;
         }
         else {
+            fab.setImageDrawable(getDrawable(R.drawable.temp_celsius));
             for (DayInfo di : daysList) {
                 di.setCelsius(true);
                 di.setTemperature(convertToCelsius(di.getTemperature()));
             }
-//            currentTemperature=convertToCelsius(currentTemperature);
-//            String title = String.format(getResources().getString(R.string.label_current_temperature), currentTemperature);
-//            getSupportActionBar().setTitle(title + getTempAbbreviation());
+            isCelsius=true;
         }
-        //Toggle betweetn celsius and fahrenheit
-        isCelsius=!isCelsius;
         cardAdapter.updateData(daysList);
-
     }
 
 
@@ -159,7 +131,14 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     private ArrayList<DayInfo> createList() {
         ArrayList<DayInfo> al = new ArrayList<DayInfo>();
         String[] namesList = getResources().getStringArray(R.array.days_names_array);
-        DayInfo day;
+        //1st row will be ambient temperature
+        DayInfo day = new DayInfo();
+        day.setTemperature(currentTemperature);
+        day.setImage(getDrawable(R.drawable.device));
+        day.setName(getString(R.string.label_current_temperature));
+        day.setCelsius(isCelsius);
+        al.add(day);
+
         for (int i = 0; i < 5; i++) {
             day = new DayInfo();
             day.setName(namesList[i]);
@@ -180,7 +159,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     }
 
     private int getRandonImage() {
-        int max = 2;
+        int max = 4;
         Random rand = new Random();
         int randonTemp = rand.nextInt(max);
         switch (randonTemp) {
@@ -188,6 +167,10 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
                 return R.drawable.cloudy;
             case 1:
                 return R.drawable.sunny;
+            case 2:
+                return R.drawable.snowy;
+            case 3:
+                return R.drawable.thunderstorm;
             default:
                 return R.drawable.sunny;
         }
