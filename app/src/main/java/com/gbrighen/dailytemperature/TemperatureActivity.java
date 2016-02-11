@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -25,6 +26,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         System.loadLibrary("conversion_module");
     }
     private native float convertToCelsius(float t);
+    private native float convertToFahrenheit(float t);
 
 
     private final String SETTINGS_TEMPERATURE = "celsius";
