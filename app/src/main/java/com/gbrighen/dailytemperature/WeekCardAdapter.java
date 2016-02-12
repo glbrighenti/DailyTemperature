@@ -11,6 +11,19 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+/**
+ * Implementation of Recycler view Adapter used for displaying CardView (each day of the week)
+ * This adapter is pretty much a standard implementation of a custom adapter where you need to
+ * override the onCreateViewHolder to initialize elements used on the custom view and
+ * onBindViewHolder to fill the data for each element inside the view.
+ * In this case the elemets that needs to filled are the data contained in the DaysInfo.
+ * For this the constructor received a ArrayList with all the DaysInfo already filled.
+ * The Celsius and Fahreheint temperatures (converted beforehand using NDK) list is also available
+ * Keeping 2 list altought might use more moemry provides a much fasted implementation since we
+ * dont need to reclaculate the temperature conversion for each time the user presses the button.
+ * Instead we just fetch the data from the filled lists temperaturesCelsiusList and
+ * temperaturesFahrenheitList
+ */
 public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekViewHolder> {
 
     private ArrayList<DayInfo> daysInfoList;
@@ -50,12 +63,12 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
                 FloatingActionButton buttonInList=(FloatingActionButton) view;
                 if(daysInfoList.get(pos).getCelsius()){
                     buttonInList.setImageDrawable(iconFahrenheit);
-                    daysInfoList.get(pos).setCelsius(false);
+                    daysInfoList.get(pos).setIsCelsiusUnit(false);
                     daysInfoList.get(pos).setTemperature(temperaturesFahrenheitList[pos]);
                 }
                 else{
                     buttonInList.setImageDrawable(iconCelsius);
-                    daysInfoList.get(pos).setCelsius(true);
+                    daysInfoList.get(pos).setIsCelsiusUnit(true);
                     daysInfoList.get(pos).setTemperature(temperaturesCelsiusList[pos]);
                 }
                 notifyDataSetChanged();
@@ -96,6 +109,11 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         }
     }
 
+    /**
+     * Get unit abbreviation
+     * @param isCelsius inform which unit we want to fetch
+     * @return string with appropriate abbreviation
+     */
     private String getTempAbbreviation(boolean isCelsius) {
         if (isCelsius) {
             return "°C";

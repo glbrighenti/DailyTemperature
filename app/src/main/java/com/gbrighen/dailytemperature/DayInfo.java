@@ -2,6 +2,14 @@ package com.gbrighen.dailytemperature;
 
 import android.graphics.drawable.Drawable;
 
+/**
+ * This class has information for each day object on Activity.
+ * It contains all the information to be displayed in the card view like:
+ * Unit is currently being used (Celsius or Farenheit),
+ * Day temperature,
+ * Day Image
+ * Day Name
+ */
 public class DayInfo {
     private String name;
     private Float temperature;
@@ -12,7 +20,7 @@ public class DayInfo {
         return isCelsius;
     }
 
-    public void setCelsius(boolean celsius) {
+    public void setIsCelsiusUnit(boolean celsius) {
         this.isCelsius = celsius;
     }
 
@@ -32,10 +40,7 @@ public class DayInfo {
         this.temperature = temperature;
     }
 
-    public String getName() {
-
-        return name;
-    }
+    public String getName() { return this.name; }
 
     public void setName(String name) {
         this.name = name;

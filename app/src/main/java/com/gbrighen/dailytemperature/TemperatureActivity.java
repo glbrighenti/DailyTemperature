@@ -14,14 +14,30 @@ import android.support.v7.widget.Toolbar;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Activity that controls the display for application
+ * This activity will start by creating random temperature data and loading all UI elements, and
+ * registering the Temperature Sensor.
+ * The data will be passed to a recyclerview that will take care of rendering the cardview
+ * When creating the random temperature, a float arrays is created. The first position is the data
+ * from the sensor(if available), and the rest are each day in order (Mon,Tue,Wed,Thu,Fri)
+ * After random number are assigned we use NDK to converted this whole list to fahrenheits.
+ * 
+ */
 public class TemperatureActivity extends AppCompatActivity implements SensorEventListener {
-    //Loading .so library that was compiled before using ndk-build
+
+    /*
+     * Loading .so library that was compiled before using ndk-build.
+     * Since we use the native methods on app startup we need the lib loaded immediately
+     */
+
     static {
         System.loadLibrary("conversion_module");
     }
 
-    //native methods that are defined in the conversion module
-    private native float[] convertToFahrenheit(float t[]);
+
+    //Native method that is defined in the conversion_module included above
+    private native float[] convertToFahrenheit(float tempCelsius[]);
 
     private SensorManager sensorManager;
     private Sensor tempSensor;
@@ -30,14 +46,14 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     private float[] temperaturesCelsiusList ;
     private float[] temperaturesFahrenheitList;
     private WeekCardAdapter cardAdapter;
-    private long previusUpdate = 0;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temperature);
-        //populating fake temperature list in celsius, and already calculate its fahrenheits equivalents for each element
+        
+        //Populating fake random temperature list in Celsius, and already calculate its fahrenheit equivalent for each element
         daysList = createList();
 
         //setup UI components
@@ -52,19 +68,19 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         recyclerView.setAdapter(cardAdapter);
 
 
-        //init sensor
+        //initialize sensor
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         tempSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
 
     }
 
     /*
-    Methods implemented from SensorEventListener. this callbacks will provide the sensor data once it is available, or updated.
+     * Methods implemented from SensorEventListener. These callbacks will provide the sensor data once it is available, or updated.
      */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        //allowing only .5 C increment to avoid too much unnecessary update
-        if(Math.abs(currentTemperature-sensorEvent.values[0])<1){
+        //Allowing only 0.5C increment to avoid too many updates
+        if(Math.abs(currentTemperature-sensorEvent.values[0])<0.5){
             return;
         }
 
@@ -82,7 +98,8 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
-
+        //This callback is not used in our app, since we are not worried at this moment with the sensor accuracy.
+        return;
     }
 
     /*
@@ -101,16 +118,18 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         sensorManager.unregisterListener(this);
     }
 
+    //Helper methods to fake the random weather data
 
-    /*
-    Helper methods to fake the weather data
-
-     */
+	/**
+	 * Create a list with the week days and their temperature.
+	 * Call the appropriate methods for random temperature generation and temperature conversion by NDK
+     * @return a list of objects containing information for each day
+	 */
     private ArrayList<DayInfo> createList() {
         ArrayList<DayInfo> al = new ArrayList<DayInfo>();
         String[] namesList = getResources().getStringArray(R.array.days_names_array);
         temperaturesCelsiusList = getRandomTemperature();
-        temperaturesFahrenheitList = convertToFahrenheit(temperaturesCelsiusList);
+        temperaturesFahrenheitList = convertToFahrenheit(temperaturesCelsiusList); //Temperature conversion via NDK
 
         DayInfo day;
 
@@ -119,12 +138,16 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
             day.setName(namesList[i]);
             day.setTemperature(temperaturesCelsiusList[i]);
             day.setImage(getDrawable(getRandomImage(i)));
-            day.setCelsius(true);
+            day.setIsCelsiusUnit(true);
             al.add(day);
         }
         return al;
     }
-    //fills an array with random  temperature value
+    
+    /**
+     * Fills an array with random temperature value
+     * @return an array of size 6 (5 week days + sensor temperature) with random temperature values ranging from -20C to 50C.
+     */
     private  float[] getRandomTemperature() {
         float[] tempList = new float[6];
         Random rand = new Random();
@@ -136,6 +159,11 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         return tempList;
     }
 
+    /**
+     * Populates the image attribute for each day randomly
+     * @param i position on the list
+
+     */
     private int getRandomImage(int i) {
         if(i==0){
             return R.drawable.device;
