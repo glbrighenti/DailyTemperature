@@ -13,14 +13,15 @@ import java.util.ArrayList;
 
 public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekViewHolder> {
 
-    //native methods that are defined in the conversion module
-    private native float convertToCelsius(float t);
-    private native float convertToFahrenheit(float t);
-
     private ArrayList<DayInfo> daysInfoList;
+    private float[] temperaturesCelsiusList ;
+    private float[] temperaturesFahrenheitList;
     private Drawable iconCelsius, iconFahrenheit;
-    public WeekCardAdapter(ArrayList<DayInfo> info) {
+
+    public WeekCardAdapter(ArrayList<DayInfo> info,float[] tempF,float[] tempC) {
         this.daysInfoList = info;
+        this.temperaturesCelsiusList=tempC;
+        this.temperaturesFahrenheitList =tempF;
     }
 
     @Override
@@ -50,14 +51,12 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
                 if(daysInfoList.get(pos).getCelsius()){
                     buttonInList.setImageDrawable(iconFahrenheit);
                     daysInfoList.get(pos).setCelsius(false);
-                    daysInfoList.get(pos).setTemperature(
-                            convertToFahrenheit(daysInfoList.get(pos).getTemperature()));
+                    daysInfoList.get(pos).setTemperature(temperaturesFahrenheitList[pos]);
                 }
                 else{
                     buttonInList.setImageDrawable(iconCelsius);
                     daysInfoList.get(pos).setCelsius(true);
-                    daysInfoList.get(pos).setTemperature(
-                            convertToCelsius(daysInfoList.get(pos).getTemperature()));
+                    daysInfoList.get(pos).setTemperature(temperaturesCelsiusList[pos]);
                 }
                 notifyDataSetChanged();
             }
@@ -69,8 +68,10 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         return daysInfoList.size();
     }
 
-    public void updateData(ArrayList<DayInfo> al) {
+    public void updateData(ArrayList<DayInfo> al,float[] tempF,float[] tempC) {
         this.daysInfoList = al;
+        this.temperaturesCelsiusList=tempC;
+        this.temperaturesFahrenheitList =tempF;
         notifyDataSetChanged();
     }
 
@@ -92,30 +93,8 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
             mDayImage = (ImageView) v.findViewById(R.id.image_day);
             mUnit = (TextView) v.findViewById(R.id.text_day_unit);
             mFab = (FloatingActionButton) v.findViewById(R.id.fab);
-            int position  =   getAdapterPosition();
-
         }
     }
-//
-//    private void updateData() {
-//        if (isCelsius) {
-//            fab.setImageDrawable(getDrawable(R.drawable.temp_fahrenheit));
-//            for (DayInfo di : daysList) {
-//                di.setCelsius(false);
-//                di.setTemperature(convertToFahrenheit(di.getTemperature()));
-//            }
-//            isCelsius = false;
-//        } else {
-//            fab.setImageDrawable(getDrawable(R.drawable.temp_celsius));
-//            for (DayInfo di : daysList) {
-//                di.setCelsius(true);
-//                di.setTemperature(convertToCelsius(di.getTemperature()));
-//            }
-//            isCelsius = true;
-//        }
-//        cardAdapter.updateData(daysList);
-//    }
-
 
     private String getTempAbbreviation(boolean isCelsius) {
         if (isCelsius) {

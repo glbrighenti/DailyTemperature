@@ -1,22 +1,23 @@
 #include <jni.h>
 
 
-jfloat
-Java_com_gbrighen_dailytemperature_TemperatureActivity_convertToFahrenheit( JNIEnv* env, jobject obj,jfloat temp_c ){
-    jfloat temp_f=1.8*temp_c+32;
-    return temp_f;
+jfloatArray
+Java_com_gbrighen_dailytemperature_TemperatureActivity_convertToFahrenheit( JNIEnv* env, jobject obj,jfloatArray temp_c ){
+    int i=0;
+    jfloatArray result;
+    jsize size = (*env)->GetArrayLength(env, temp_c);
+
+    result = (*env)->NewFloatArray(env, size);
+
+    jfloat temp_f[size];
+    jfloat *element_c = (*env)->GetFloatArrayElements(env, temp_c, 0);
+
+    for(i=0;i<size;i++){
+        temp_f[i]=1.8*element_c[i]+32;
+    }
+
+    (*env)->SetFloatArrayRegion(env, result, 0, size, temp_f);
+
+    return result;
 }
 
-
-jfloat
-Java_com_gbrighen_dailytemperature_WeekCardAdapter_convertToCelsius( JNIEnv* env, jobject obj,jfloat temp_f ){
-    jfloat temp_c=(temp_f-32)*5/9;
-    return temp_c;
-}
-
-
-jfloat
-Java_com_gbrighen_dailytemperature_WeekCardAdapter_convertToFahrenheit( JNIEnv* env, jobject obj,jfloat temp_c ){
-    jfloat temp_f=1.8*temp_c+32;
-    return temp_f;
-}
