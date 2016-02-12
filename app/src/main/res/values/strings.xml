@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Daily Temperature</string>
+    <string name="app_name">Q Temperature</string>
     <string name="action_settings">Settings</string>
     <string name="label_monday">Monday:</string>
     <string name="label_tuesday">Tuesday:</string>

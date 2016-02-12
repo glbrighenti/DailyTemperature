@@ -1,19 +1,17 @@
 package com.gbrighen.dailytemperature;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -24,17 +22,17 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     static {
         System.loadLibrary("conversion_module");
     }
+
     //native methods that are defined in the conversion module
-    private native float convertToCelsius(float t);
     private native float convertToFahrenheit(float t);
-    
+
     private SensorManager sensorManager;
     private Sensor tempSensor;
     private float currentTemperature = 0;
-    private boolean isCelsius=true; //Since android provides temperature in Celsius this is the default preference.
     private ArrayList<DayInfo> daysList;
     private WeekCardAdapter cardAdapter;
     private FloatingActionButton fab;
+    private long previusUpdate = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +40,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         setContentView(R.layout.activity_temperature);
         //populating fake data
         daysList = createList();
+
         //setup UI components
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -52,15 +51,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         recyclerView.setLayoutManager(layoutManager);
         cardAdapter = new WeekCardAdapter(daysList);
         recyclerView.setAdapter(cardAdapter);
-        fab = (FloatingActionButton) findViewById(R.id.fab);
 
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateData();
-            }
-        });
 
         //init sensor
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -74,11 +65,13 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         currentTemperature = sensorEvent.values[0]; //this data will always come as Celsius
-        if(!isCelsius){
-            currentTemperature=convertToFahrenheit(currentTemperature);
+        if (!daysList.get(0).getCelsius()) {
+            currentTemperature = convertToFahrenheit(currentTemperature);
         }
         daysList.get(0).setTemperature(currentTemperature);
         cardAdapter.updateData(daysList);
+
+
     }
 
     @Override
@@ -103,30 +96,9 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     }
 
 
-
-    private void updateData() {
-        if (isCelsius) {
-            fab.setImageDrawable(getDrawable(R.drawable.temp_fahrenheit));
-            for (DayInfo di : daysList) {
-                di.setCelsius(false);
-                di.setTemperature(convertToFahrenheit(di.getTemperature()));
-            }
-            isCelsius=false;
-        }
-        else {
-            fab.setImageDrawable(getDrawable(R.drawable.temp_celsius));
-            for (DayInfo di : daysList) {
-                di.setCelsius(true);
-                di.setTemperature(convertToCelsius(di.getTemperature()));
-            }
-            isCelsius=true;
-        }
-        cardAdapter.updateData(daysList);
-    }
-
-
     /*
     Helper methods to fake the weather data
+
      */
     private ArrayList<DayInfo> createList() {
         ArrayList<DayInfo> al = new ArrayList<DayInfo>();
@@ -136,15 +108,15 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         day.setTemperature(currentTemperature);
         day.setImage(getDrawable(R.drawable.device));
         day.setName(getString(R.string.label_current_temperature));
-        day.setCelsius(isCelsius);
+        day.setCelsius(true);
         al.add(day);
 
         for (int i = 0; i < 5; i++) {
             day = new DayInfo();
             day.setName(namesList[i]);
             day.setTemperature(getRandomTemperature());
-            day.setImage(getDrawable(getRandonImage()));
-            day.setCelsius(isCelsius);
+            day.setImage(getDrawable(getRandomImage()));
+            day.setCelsius(true);
             al.add(day);
         }
         return al;
@@ -158,11 +130,11 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         return randonTemp;
     }
 
-    private int getRandonImage() {
+    private int getRandomImage() {
         int max = 4;
         Random rand = new Random();
-        int randonTemp = rand.nextInt(max);
-        switch (randonTemp) {
+        int randomTemp = rand.nextInt(max);
+        switch (randomTemp) {
             case 0:
                 return R.drawable.cloudy;
             case 1:
