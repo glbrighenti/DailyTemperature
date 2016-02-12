@@ -38,7 +38,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
 
     //Native method that is defined in the conversion_module included above
     private native float[] convertToFahrenheit(float tempCelsius[]);
-
+    private final int NUMBER_OF_CARDS=6;
     private SensorManager sensorManager;
     private Sensor tempSensor;
     private float currentTemperature = 0;
@@ -90,11 +90,13 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         }
 
         currentTemperature = sensorEvent.values[0]; //this data will always come as Celsius
-        temperaturesCelsiusList[0]=currentTemperature;
-        temperaturesFahrenheitList=convertToFahrenheit(temperaturesCelsiusList);
-        if (!daysList.get(0).isCelsiusUnit()) {
+        temperaturesCelsiusList[0]=currentTemperature;//new data from sensor, we need to update the celsius list
+        temperaturesFahrenheitList=convertToFahrenheit(temperaturesCelsiusList);//also update fahrenheit list
+
+        if (!daysList.get(0).isCelsiusUnit()) {//if user already changed ambient temperature to F, we need to pass correct data
             currentTemperature = temperaturesFahrenheitList[0];
         }
+        //update UI
         daysList.get(0).setTemperature(currentTemperature);
         cardAdapter.updateData(daysList,temperaturesFahrenheitList,temperaturesCelsiusList);
 
@@ -108,8 +110,8 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     }
 
     /*
-    Registering and unregistering the SensorManager events depending on activity lifecycle.
-    We want the callbacks active when the activity is on top, and we don't need the sensor data once it goes to the background.
+    * Registering and unregistering the SensorManager events depending on activity lifecycle.
+    * We want the callbacks active when the activity is on top, and we don't need the sensor data once it goes to the background.
      */
     @Override
     protected void onResume() {
@@ -138,7 +140,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
 
         DayInfo day;
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < NUMBER_OF_CARDS; i++) {
             day = new DayInfo();
             day.setName(namesList[i]);
             day.setTemperature(temperaturesCelsiusList[i]);
@@ -151,14 +153,14 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     
     /**
      * Fills an array with random temperature value
-     * @return an array of size 6 (5 week days + sensor temperature) with random temperature values ranging from -20C to 50C.
+     * @return an array of size NUMBER_OF_CARDS = 6 (5 week days + sensor temperature) with random temperature values ranging from -20C to 50C.
      */
     private  float[] getRandomTemperature() {
-        float[] tempList = new float[6];
+        float[] tempList = new float[NUMBER_OF_CARDS];
         Random rand = new Random();
         float min = -20.0f; //using believable temperatures
         float max = 50.0f;
-        for(int i=0;i<6;i++){
+        for(int i=0;i<NUMBER_OF_CARDS;i++){
             tempList[i]=(rand.nextFloat() * (max - min) + min);
         }
         return tempList;
