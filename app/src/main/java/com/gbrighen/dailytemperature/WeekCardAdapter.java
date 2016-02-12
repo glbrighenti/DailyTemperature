@@ -48,26 +48,39 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         return new WeekViewHolder(view);
     }
 
+    /**
+     * This method will render all the cardviews, using the appropriate data.
+     * Here we set the listeners for each button. this will trigger the conversion which is simply
+     * fetch the data that had been processed already before creating this adapter.
+     * After we change the data on the appropriate position we need to notifyDataSetChanged to cause
+     * android to render the cards again, updating the temperature and the button
+     * @param holder ViewHolder that understands our custom design
+     * @param position position in the list
+     */
     @Override
     public void onBindViewHolder(WeekViewHolder holder, int position) {
         final int pos=position;
         DayInfo dayInfo = daysInfoList.get(position);
         holder.mDayName.setText(dayInfo.getName());
         holder.mDayTemperature.setText(String.format("%.1f", dayInfo.getTemperature()));
-        holder.mUnit.setText(getTempAbbreviation(dayInfo.getCelsius()));
+        holder.mUnit.setText(getTempAbbreviation(dayInfo.isCelsiusUnit()));
         holder.mDayImage.setImageDrawable(dayInfo.getImage());
+        if(daysInfoList.get(pos).isCelsiusUnit()){
+            holder.mFab.setImageDrawable(iconCelsius);
+        }
+        else {
+            holder.mFab.setImageDrawable(iconFahrenheit);
+        }
         ///button that will trigger the conversion
         holder.mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FloatingActionButton buttonInList=(FloatingActionButton) view;
-                if(daysInfoList.get(pos).getCelsius()){
-                    buttonInList.setImageDrawable(iconFahrenheit);
+                if(daysInfoList.get(pos).isCelsiusUnit()){
                     daysInfoList.get(pos).setIsCelsiusUnit(false);
                     daysInfoList.get(pos).setTemperature(temperaturesFahrenheitList[pos]);
                 }
                 else{
-                    buttonInList.setImageDrawable(iconCelsius);
                     daysInfoList.get(pos).setIsCelsiusUnit(true);
                     daysInfoList.get(pos).setTemperature(temperaturesCelsiusList[pos]);
                 }

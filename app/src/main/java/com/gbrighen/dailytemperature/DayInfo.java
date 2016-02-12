@@ -16,7 +16,7 @@ public class DayInfo {
     private Drawable image;
     private boolean isCelsius;
 
-    public boolean getCelsius() {
+    public boolean isCelsiusUnit() {
         return isCelsius;
     }
 

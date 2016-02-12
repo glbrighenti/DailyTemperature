@@ -17,12 +17,12 @@ import java.util.Random;
 /**
  * Activity that controls the display for application
  * This activity will start by creating random temperature data and loading all UI elements, and
- * registering the Temperature Sensor.
+ * registering the Temperature Sensor listeners.
  * The data will be passed to a recyclerview that will take care of rendering the cardview
- * When creating the random temperature, a float arrays is created. The first position is the data
+ * When creating the random temperature, a float array is created. The first position is the data
  * from the sensor(if available), and the rest are each day in order (Mon,Tue,Wed,Thu,Fri)
- * After random number are assigned we use NDK to converted this whole list to fahrenheits.
- * 
+ * After random number are assigned we use NDK to convert this whole list to fahrenheits.
+ *
  */
 public class TemperatureActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -52,8 +52,12 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temperature);
-        
-        //Populating fake random temperature list in Celsius, and already calculate its fahrenheit equivalent for each element
+
+        /**
+         * Populating fake random temperature list in Celsius,
+         * and already calculate its fahrenheit equivalent for each element
+         */
+
         daysList = createList();
 
         //setup UI components
@@ -75,19 +79,20 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     }
 
     /*
-     * Methods implemented from SensorEventListener. These callbacks will provide the sensor data once it is available, or updated.
+     * Methods implemented from SensorEventListener.
+     * These callbacks will provide the sensor data once it is available, or updated.
      */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         //Allowing only 0.5C increment to avoid too many updates
-        if(Math.abs(currentTemperature-sensorEvent.values[0])<0.5){
+        if(Math.abs(currentTemperature-sensorEvent.values[0])<1){
             return;
         }
 
         currentTemperature = sensorEvent.values[0]; //this data will always come as Celsius
         temperaturesCelsiusList[0]=currentTemperature;
         temperaturesFahrenheitList=convertToFahrenheit(temperaturesCelsiusList);
-        if (!daysList.get(0).getCelsius()) {
+        if (!daysList.get(0).isCelsiusUnit()) {
             currentTemperature = temperaturesFahrenheitList[0];
         }
         daysList.get(0).setTemperature(currentTemperature);
