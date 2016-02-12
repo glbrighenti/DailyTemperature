@@ -84,7 +84,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
      */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        //Allowing only 0.5C increment to avoid too many updates
+        // not allowing small increments on temperature to avoid too many updates
         if(Math.abs(currentTemperature-sensorEvent.values[0])<1){
             return;
         }
