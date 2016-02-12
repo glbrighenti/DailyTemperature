@@ -16,12 +16,12 @@ import java.util.Random;
 
 /**
  * Activity that controls the display for application
- * This activity will start by creating random temperature data and loading all UI elements, and
+ * This activity will start by creating random temperature data, loading all UI elements, and
  * registering the Temperature Sensor listeners.
  * The data will be passed to a recyclerview that will take care of rendering the cardview
  * When creating the random temperature, a float array is created. The first position is the data
  * from the sensor(if available), and the rest are each day in order (Mon,Tue,Wed,Thu,Fri)
- * After random number are assigned we use NDK to convert this whole list to fahrenheits.
+ * After random number are assigned we use NDK to convert this whole list to fahrenheit.
  *
  */
 public class TemperatureActivity extends AppCompatActivity implements SensorEventListener {
@@ -109,7 +109,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
 
     /*
     Registering and unregistering the SensorManager events depending on activity lifecycle.
-    We want the callbacks active when the activity is on top, and we don't need the sensor data once is goes to the background.
+    We want the callbacks active when the activity is on top, and we don't need the sensor data once it goes to the background.
      */
     @Override
     protected void onResume() {
@@ -167,7 +167,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     /**
      * Populates the image attribute for each day randomly
      * @param i position on the list
-
+	 * @return integer indicating the image to be loaded
      */
     private int getRandomImage(int i) {
         if(i==0){

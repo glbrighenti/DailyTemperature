@@ -16,11 +16,11 @@ import java.util.ArrayList;
  * This adapter is pretty much a standard implementation of a custom adapter where you need to
  * override the onCreateViewHolder to initialize elements used on the custom view and
  * onBindViewHolder to fill the data for each element inside the view.
- * In this case the elemets that needs to filled are the data contained in the DaysInfo.
+ * In this case the elemets that need to filled are the data contained in the DaysInfo.
  * For this the constructor received a ArrayList with all the DaysInfo already filled.
  * The Celsius and Fahreheint temperatures (converted beforehand using NDK) list is also available
- * Keeping 2 list altought might use more moemry provides a much fasted implementation since we
- * dont need to reclaculate the temperature conversion for each time the user presses the button.
+ * Keeping 2 lists although might use more memory provides a much faster implementation since we
+ * don't need to recalculate the temperature conversion for each time the user presses the button.
  * Instead we just fetch the data from the filled lists temperaturesCelsiusList and
  * temperaturesFahrenheitList
  */
@@ -50,10 +50,10 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
 
     /**
      * This method will render all the cardviews, using the appropriate data.
-     * Here we set the listeners for each button. this will trigger the conversion which is simply
+     * Here we set the listeners for each button. This will trigger the conversion which is simply
      * fetch the data that had been processed already before creating this adapter.
      * After we change the data on the appropriate position we need to notifyDataSetChanged to cause
-     * android to render the cards again, updating the temperature and the button
+     * Android to render the cards again, updating the temperature and the button.
      * @param holder ViewHolder that understands our custom design
      * @param position position in the list
      */

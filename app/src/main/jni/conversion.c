@@ -5,9 +5,9 @@
 
 
 /*
- * This method receives and float array with celsius temperatures, and return another float array
+ * This method receives a float array with celsius temperatures, and return another float array
  * with each element converted to fahrenheit.
- * Since this is jni we need to use proper method to deal with arrays. So to manipulate we need to
+ * Since this is JNI we need to use proper method to deal with arrays. So to manipulate we need to
  * use methods like:
  * GetArrayLength to get the size of jfloatArray,
  * GetFloatArrayElements to access the first member of jfloatArray,
@@ -33,9 +33,9 @@ Java_com_gbrighen_dailytemperature_TemperatureActivity_convertToFahrenheit(
 
     //Fill return array previously allocated with float[] result from conversion above
     (*env)->SetFloatArrayRegion(env, result, 0, size, temp_f);
-    //We need release arrays that used GetFloatArrayElements previously
+    
+	//We need release arrays that used GetFloatArrayElements previously
     (*env)->ReleaseFloatArrayElements(env, temp_c, element_c, 0);
-
 
     return result;
 }
