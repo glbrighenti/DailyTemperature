@@ -13,7 +13,7 @@
  * GetFloatArrayElements to access the first member of jfloatArray,
  * NewFloatArray, to allocate a new jfloatArray to return the new values.
  */
-jfloatArray
+JNIEXPORT jfloatArray
 Java_com_gbrighen_dailytemperature_TemperatureActivity_convertToFahrenheit(
         JNIEnv* env, jobject obj,jfloatArray temp_c ){
     int i=0;
