@@ -2,7 +2,12 @@
 /*
  * Providing implementation of native conversion code.
  */
-
+#ifndef _Included_com_gbrighen_dailytemperature_TemperatureActivity
+#define _Included_com_gbrighen_dailytemperature_TemperatureActivity
+#ifdef __cplusplus
+extern "C" {
+#endif
+#endif
 
 /*
  * This method receives a float array with celsius temperatures, and return another float array
@@ -13,7 +18,7 @@
  * GetFloatArrayElements to access the first member of jfloatArray,
  * NewFloatArray, to allocate a new jfloatArray to return the new values.
  */
-JNIEXPORT jfloatArray
+JNIEXPORT jfloatArray JNICALL
 Java_com_gbrighen_dailytemperature_TemperatureActivity_convertToFahrenheit(
         JNIEnv* env, jobject obj,jfloatArray temp_c ){
     int i=0;
