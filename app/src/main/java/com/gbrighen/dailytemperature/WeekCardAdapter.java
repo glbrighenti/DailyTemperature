@@ -29,13 +29,13 @@ import java.util.ArrayList;
 public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekViewHolder> {
 
     private ArrayList<DayInfo> daysInfoList;
-    private float[] temperaturesCelsiusList ;
+    private float[] temperaturesCelsiusList;
     private float[] temperaturesFahrenheitList;
 
-    public WeekCardAdapter(ArrayList<DayInfo> info,float[] tempF,float[] tempC) {
+    public WeekCardAdapter(ArrayList<DayInfo> info, float[] tempF, float[] tempC) {
         this.daysInfoList = info;
-        this.temperaturesCelsiusList=tempC;
-        this.temperaturesFahrenheitList =tempF;
+        this.temperaturesCelsiusList = tempC;
+        this.temperaturesFahrenheitList = tempF;
     }
 
     @Override
@@ -53,12 +53,13 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
      * fetch the data that had been processed already before creating this adapter.
      * After we change the data on the appropriate position we need to notifyDataSetChanged to cause
      * Android to render the cards again, updating the temperature and the button.
-     * @param holder ViewHolder that understands our custom design
+     *
+     * @param holder   ViewHolder that understands our custom design
      * @param position position in the list
      */
     @Override
     public void onBindViewHolder(WeekViewHolder holder, int position) {
-        final int pos=position;
+        final int pos = position;
         DayInfo dayInfo = daysInfoList.get(position);
         holder.mDayName.setText(dayInfo.getName());
         holder.mDayTemperature.setText(String.format("%.1f", dayInfo.getTemperature().getValue()));
@@ -70,15 +71,18 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         holder.mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FloatingActionButton buttonInList=(FloatingActionButton) view;
-                if(daysInfoList.get(pos).isCelsiusUnit()){
-                    daysInfoList.get(pos).setIsCelsiusUnit(false);
-                    daysInfoList.get(pos).setTemperature(new Fahrenheit(view.getContext(),temperaturesFahrenheitList[pos]));
+                FloatingActionButton buttonInList = (FloatingActionButton) view;
+                switch (daysInfoList.get(pos).getTemperature().getType()) {
+                    case CELSIUS:
+                        daysInfoList.get(pos).setTemperature(new Fahrenheit(view.getContext(), temperaturesFahrenheitList[pos]));
+                        break;
+
+                    case FAHRENHEIT:
+                        daysInfoList.get(pos).setTemperature(new Celsius(view.getContext(), temperaturesCelsiusList[pos]));
+                        break;
+
                 }
-                else{
-                    daysInfoList.get(pos).setIsCelsiusUnit(true);
-                    daysInfoList.get(pos).setTemperature(new Celsius(view.getContext(),temperaturesCelsiusList[pos]));
-                }
+
                 notifyDataSetChanged();
             }
         });
@@ -89,10 +93,10 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         return daysInfoList.size();
     }
 
-    public void updateData(ArrayList<DayInfo> al,float[] tempF,float[] tempC) {
+    public void updateData(ArrayList<DayInfo> al, float[] tempF, float[] tempC) {
         this.daysInfoList = al;
-        this.temperaturesCelsiusList=tempC;
-        this.temperaturesFahrenheitList =tempF;
+        this.temperaturesCelsiusList = tempC;
+        this.temperaturesFahrenheitList = tempF;
         notifyDataSetChanged();
     }
 
@@ -106,7 +110,6 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         protected FloatingActionButton mFab;
 
 
-
         public WeekViewHolder(View v) {
             super(v);
             mDayName = (TextView) v.findViewById(R.id.text_day_name);
@@ -116,7 +119,6 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
             mFab = (FloatingActionButton) v.findViewById(R.id.fab);
         }
     }
-
 
 
 }

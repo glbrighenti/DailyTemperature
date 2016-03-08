@@ -40,4 +40,10 @@ public class Fahrenheit implements ITemperature {
     public Drawable getIcon() {
         return context.getResources().getDrawable(R.drawable.temp_fahrenheit);
     }
+
+    @Override
+    public TYPE getType() {
+        return TYPE.FAHRENHEIT;
+    }
+
 }

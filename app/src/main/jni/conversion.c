@@ -42,3 +42,11 @@ Java_com_gbrighen_dailytemperature_TemperatureActivity_convertToFahrenheit(
     return result;
 }
 
+
+JNIEXPORT jfloat JNICALL
+Java_com_gbrighen_dailytemperature_TemperatureActivity_convertSingleFahrenheit(
+        JNIEnv* env, jobject obj,jfloat temp_c ){
+    return 1.8*temp_c+32;
+}
+
+

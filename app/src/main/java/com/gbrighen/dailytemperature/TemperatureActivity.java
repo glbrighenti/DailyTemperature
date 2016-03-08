@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import com.gbrighen.dailytemperature.temperatures.Celsius;
+import com.gbrighen.dailytemperature.temperatures.Fahrenheit;
 import com.gbrighen.dailytemperature.temperatures.ITemperature;
 
 import java.util.ArrayList;
@@ -25,7 +26,6 @@ import java.util.Random;
  * When creating the random temperature, a float array is created. The first position is the data
  * from the sensor(if available), and the rest are each day in order (Mon,Tue,Wed,Thu,Fri)
  * After random number are assigned we use NDK to convert this whole list to fahrenheit.
- *
  */
 public class TemperatureActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -41,12 +41,14 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
 
     //Native method that is defined in the conversion_module included above
     private native float[] convertToFahrenheit(float tempCelsius[]);
-    private final int NUMBER_OF_CARDS=6;
+
+    private native float convertSingleFahrenheit(float tempCelsius);
+
+    private final int NUMBER_OF_CARDS = 6;
     private SensorManager sensorManager;
     private Sensor tempSensor;
-    private float currentTemperature = 0;
     private ArrayList<DayInfo> daysList;
-    private float[] temperaturesCelsiusList ;
+    private float[] temperaturesCelsiusList;
     private float[] temperaturesFahrenheitList;
 
     private WeekCardAdapter cardAdapter;
@@ -72,7 +74,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-        cardAdapter = new WeekCardAdapter(daysList,temperaturesFahrenheitList,temperaturesCelsiusList);
+        cardAdapter = new WeekCardAdapter(daysList, temperaturesFahrenheitList, temperaturesCelsiusList);
         recyclerView.setAdapter(cardAdapter);
 
 
@@ -88,24 +90,31 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
      */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        // not allowing small increments on temperature to avoid too many updates
-//        if(Math.abs(currentTemperature-sensorEvent.values[0])<1){
+//        // not allowing small increments on temperature to avoid too many updates - better UX
+//        if(Math.abs(currentTemperature-sensorEvent.values[0])<0.5){
 //            return;
 //        }
-//
-//        currentTemperature = sensorEvent.values[0]; //this data will always come as Celsius
-//        temperaturesCelsiusList[0]=currentTemperature;//new data from sensor, we need to update the celsius list
-//        temperaturesFahrenheitList=convertToFahrenheit(temperaturesCelsiusList);//also update fahrenheit list
-//
-//        if (!daysList.get(0).isCelsiusUnit()) {//if user already changed ambient temperature to F, we need to pass correct data
-//            currentTemperature = temperaturesFahrenheitList[0];
-//        }
-//        //update UI
-//        daysList.get(0).setTemperature(currentTemperature);
-//        cardAdapter.updateData(daysList,temperaturesFahrenheitList,temperaturesCelsiusList);
+
+        //new data from sensor, we need to update the celsius list
+        //this data will always come as Celsius
+        temperaturesCelsiusList[0] = sensorEvent.values[0];
+        temperaturesFahrenheitList[0] = convertSingleFahrenheit(sensorEvent.values[0]);//also update fahrenheit list
+
+
+        //update UI
+        switch (daysList.get(0).getTemperature().getType()) {
+            case CELSIUS:
+                daysList.get(0).setTemperature(new Celsius(this, temperaturesCelsiusList[0]));
+                break;
+            case FAHRENHEIT:
+                daysList.get(0).setTemperature(new Fahrenheit(this, temperaturesCelsiusList[0]));
+                break;
+        }
+        cardAdapter.updateData(daysList, temperaturesFahrenheitList, temperaturesCelsiusList);
 
 
     }
+
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
@@ -131,11 +140,12 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
 
     //Helper methods to fake the random weather data
 
-	/**
-	 * Create a list with the week days and their temperature.
-	 * Call the appropriate methods for random temperature generation and temperature conversion by NDK
+    /**
+     * Create a list with the week days and their temperature.
+     * Call the appropriate methods for random temperature generation and temperature conversion by NDK
+     *
      * @return a list of objects containing information for each day
-	 */
+     */
     private ArrayList<DayInfo> createList() {
         ArrayList<DayInfo> al = new ArrayList<DayInfo>();
         String[] namesList = getResources().getStringArray(R.array.days_names_array);
@@ -147,36 +157,37 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         for (int i = 0; i < NUMBER_OF_CARDS; i++) {
             day = new DayInfo();
             day.setName(namesList[i]);
-            day.setTemperature(new Celsius(this,temperaturesCelsiusList[i]));
+            day.setTemperature(new Celsius(this, temperaturesCelsiusList[i]));
             day.setImage(getDrawable(getRandomImage(i)));
-            day.setIsCelsiusUnit(true);
             al.add(day);
         }
         return al;
     }
-    
+
     /**
      * Fills an array with random temperature value
+     *
      * @return an array of size NUMBER_OF_CARDS = 6 (5 week days + sensor temperature) with random temperature values ranging from -20C to 50C.
      */
-    private  float[] getRandomTemperature() {
+    private float[] getRandomTemperature() {
         float[] tempList = new float[NUMBER_OF_CARDS];
         Random rand = new Random();
         float min = -20.0f; //using believable temperatures
         float max = 50.0f;
-        for(int i=0;i<NUMBER_OF_CARDS;i++){
-            tempList[i]=(rand.nextFloat() * (max - min) + min);
+        for (int i = 0; i < NUMBER_OF_CARDS; i++) {
+            tempList[i] = (rand.nextFloat() * (max - min) + min);
         }
         return tempList;
     }
 
     /**
      * Populates the image attribute for each day randomly
+     *
      * @param i position on the list
-	 * @return integer indicating the image to be loaded
+     * @return integer indicating the image to be loaded
      */
     private int getRandomImage(int i) {
-        if(i==0){
+        if (i == 0) {
             return R.drawable.device;
         }
         int max = 4;

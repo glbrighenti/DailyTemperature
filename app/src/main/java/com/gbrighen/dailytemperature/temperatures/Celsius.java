@@ -40,4 +40,11 @@ public class Celsius implements ITemperature {
     public Drawable getIcon() {
         return context.getResources().getDrawable(R.drawable.temp_celsius);
     }
+
+    @Override
+    public TYPE getType() {
+        return TYPE.CELSIUS;
+    }
+
+
 }
