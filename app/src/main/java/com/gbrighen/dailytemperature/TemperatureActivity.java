@@ -11,6 +11,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
+import com.gbrighen.dailytemperature.temperatures.Celsius;
+import com.gbrighen.dailytemperature.temperatures.ITemperature;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -45,6 +48,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     private ArrayList<DayInfo> daysList;
     private float[] temperaturesCelsiusList ;
     private float[] temperaturesFahrenheitList;
+
     private WeekCardAdapter cardAdapter;
 
 
@@ -85,20 +89,20 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         // not allowing small increments on temperature to avoid too many updates
-        if(Math.abs(currentTemperature-sensorEvent.values[0])<1){
-            return;
-        }
-
-        currentTemperature = sensorEvent.values[0]; //this data will always come as Celsius
-        temperaturesCelsiusList[0]=currentTemperature;//new data from sensor, we need to update the celsius list
-        temperaturesFahrenheitList=convertToFahrenheit(temperaturesCelsiusList);//also update fahrenheit list
-
-        if (!daysList.get(0).isCelsiusUnit()) {//if user already changed ambient temperature to F, we need to pass correct data
-            currentTemperature = temperaturesFahrenheitList[0];
-        }
-        //update UI
-        daysList.get(0).setTemperature(currentTemperature);
-        cardAdapter.updateData(daysList,temperaturesFahrenheitList,temperaturesCelsiusList);
+//        if(Math.abs(currentTemperature-sensorEvent.values[0])<1){
+//            return;
+//        }
+//
+//        currentTemperature = sensorEvent.values[0]; //this data will always come as Celsius
+//        temperaturesCelsiusList[0]=currentTemperature;//new data from sensor, we need to update the celsius list
+//        temperaturesFahrenheitList=convertToFahrenheit(temperaturesCelsiusList);//also update fahrenheit list
+//
+//        if (!daysList.get(0).isCelsiusUnit()) {//if user already changed ambient temperature to F, we need to pass correct data
+//            currentTemperature = temperaturesFahrenheitList[0];
+//        }
+//        //update UI
+//        daysList.get(0).setTemperature(currentTemperature);
+//        cardAdapter.updateData(daysList,temperaturesFahrenheitList,temperaturesCelsiusList);
 
 
     }
@@ -143,7 +147,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
         for (int i = 0; i < NUMBER_OF_CARDS; i++) {
             day = new DayInfo();
             day.setName(namesList[i]);
-            day.setTemperature(temperaturesCelsiusList[i]);
+            day.setTemperature(new Celsius(this,temperaturesCelsiusList[i]));
             day.setImage(getDrawable(getRandomImage(i)));
             day.setIsCelsiusUnit(true);
             al.add(day);

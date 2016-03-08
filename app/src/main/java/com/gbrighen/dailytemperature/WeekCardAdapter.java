@@ -1,6 +1,5 @@
 package com.gbrighen.dailytemperature;
 
-import android.graphics.drawable.Drawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,6 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.gbrighen.dailytemperature.temperatures.Celsius;
+import com.gbrighen.dailytemperature.temperatures.Fahrenheit;
 
 import java.util.ArrayList;
 
@@ -29,7 +31,6 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
     private ArrayList<DayInfo> daysInfoList;
     private float[] temperaturesCelsiusList ;
     private float[] temperaturesFahrenheitList;
-    private Drawable iconCelsius, iconFahrenheit;
 
     public WeekCardAdapter(ArrayList<DayInfo> info,float[] tempF,float[] tempC) {
         this.daysInfoList = info;
@@ -42,8 +43,6 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         View view = LayoutInflater.
                 from(parent.getContext()).
                 inflate(R.layout.card_layout, parent, false);
-        iconFahrenheit=parent.getContext().getDrawable(R.drawable.temp_fahrenheit);
-        iconCelsius=parent.getContext().getDrawable(R.drawable.temp_celsius);
 
         return new WeekViewHolder(view);
     }
@@ -62,15 +61,11 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         final int pos=position;
         DayInfo dayInfo = daysInfoList.get(position);
         holder.mDayName.setText(dayInfo.getName());
-        holder.mDayTemperature.setText(String.format("%.1f", dayInfo.getTemperature()));
-        holder.mUnit.setText(getTempAbbreviation(dayInfo.isCelsiusUnit()));
+        holder.mDayTemperature.setText(String.format("%.1f", dayInfo.getTemperature().getValue()));
+        holder.mUnit.setText(dayInfo.getTemperature().getAbbreviation());
         holder.mDayImage.setImageDrawable(dayInfo.getImage());
-        if(daysInfoList.get(pos).isCelsiusUnit()){
-            holder.mFab.setImageDrawable(iconCelsius);
-        }
-        else {
-            holder.mFab.setImageDrawable(iconFahrenheit);
-        }
+        holder.mFab.setImageDrawable(dayInfo.getTemperature().getIcon());
+
         ///button that will trigger the conversion
         holder.mFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,11 +73,11 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
                 FloatingActionButton buttonInList=(FloatingActionButton) view;
                 if(daysInfoList.get(pos).isCelsiusUnit()){
                     daysInfoList.get(pos).setIsCelsiusUnit(false);
-                    daysInfoList.get(pos).setTemperature(temperaturesFahrenheitList[pos]);
+                    daysInfoList.get(pos).setTemperature(new Fahrenheit(view.getContext(),temperaturesFahrenheitList[pos]));
                 }
                 else{
                     daysInfoList.get(pos).setIsCelsiusUnit(true);
-                    daysInfoList.get(pos).setTemperature(temperaturesCelsiusList[pos]);
+                    daysInfoList.get(pos).setTemperature(new Celsius(view.getContext(),temperaturesCelsiusList[pos]));
                 }
                 notifyDataSetChanged();
             }
@@ -122,17 +117,6 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         }
     }
 
-    /**
-     * Get unit abbreviation
-     * @param isCelsius inform which unit we want to fetch
-     * @return string with appropriate abbreviation
-     */
-    private String getTempAbbreviation(boolean isCelsius) {
-        if (isCelsius) {
-            return "°C";
-        } else {
-            return "°F";
-        }
-    }
+
 
 }

@@ -7,8 +7,10 @@
     <string name="label_thursday">Thursday:</string>
     <string name="label_friday">Friday:</string>
     <string name="label_current_temperature">Ambient temperature:</string>
-    <string name="label_celsius">°C</string>
-    <string name="label_fahrenheit">°F</string>
+    <string name="abbreviation_celsius">°C</string>
+    <string name="label_celsius">Celsius</string>
+    <string name="abbreviation_fahrenheit">°F</string>
+    <string name="label_fahrenheit">Fahrenheit</string>
     <string name="label_temperature">%.1f</string>
 
 
