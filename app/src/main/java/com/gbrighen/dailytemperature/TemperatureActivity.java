@@ -50,7 +50,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     private ArrayList<DayInfo> daysList;
     private float[] temperaturesCelsiusList;
     private float[] temperaturesFahrenheitList;
-
+    private float oldSensorValue=Float.MIN_VALUE;
     private WeekCardAdapter cardAdapter;
 
 
@@ -90,10 +90,12 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
      */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-//        // not allowing small increments on temperature to avoid too many updates - better UX
-//        if(Math.abs(currentTemperature-sensorEvent.values[0])<0.5){
-//            return;
-//        }
+        // not allowing small increments on temperature to avoid too many updates - better UX
+        if(Math.abs(oldSensorValue-sensorEvent.values[0])<0.2){
+            return;
+        }
+
+        oldSensorValue=sensorEvent.values[0];
 
         //new data from sensor, we need to update the celsius list
         //this data will always come as Celsius
@@ -107,9 +109,13 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
                 daysList.get(0).setTemperature(new Celsius(this, temperaturesCelsiusList[0]));
                 break;
             case FAHRENHEIT:
-                daysList.get(0).setTemperature(new Fahrenheit(this, temperaturesCelsiusList[0]));
+                daysList.get(0).setTemperature(new Fahrenheit(this, temperaturesFahrenheitList[0]));
+                break;
+            default:
+                daysList.get(0).setTemperature(new Celsius(this, temperaturesCelsiusList[0]));
                 break;
         }
+
         cardAdapter.updateData(daysList, temperaturesFahrenheitList, temperaturesCelsiusList);
 
 

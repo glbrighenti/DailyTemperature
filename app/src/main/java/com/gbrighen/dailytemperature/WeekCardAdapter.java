@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.gbrighen.dailytemperature.temperatures.Celsius;
 import com.gbrighen.dailytemperature.temperatures.Fahrenheit;
+import com.gbrighen.dailytemperature.temperatures.ITemperature;
 
 import java.util.ArrayList;
 
@@ -67,18 +68,29 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         holder.mDayImage.setImageDrawable(dayInfo.getImage());
         holder.mFab.setImageDrawable(dayInfo.getTemperature().getIcon());
 
+
         ///button that will trigger the conversion
         holder.mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FloatingActionButton buttonInList = (FloatingActionButton) view;
-                switch (daysInfoList.get(pos).getTemperature().getType()) {
+                DayInfo currDay = daysInfoList.get(pos);
+                ITemperature temp;
+
+                if(!(view instanceof FloatingActionButton)){
+                    //check before casting
+                    return;
+                }
+                switch (currDay.getTemperature().getType()) {
                     case CELSIUS:
-                        daysInfoList.get(pos).setTemperature(new Fahrenheit(view.getContext(), temperaturesFahrenheitList[pos]));
+                        temp = new Fahrenheit(view.getContext(), temperaturesFahrenheitList[pos]);
+                        currDay.setTemperature(temp);
+                        ((FloatingActionButton) view).setImageDrawable(currDay.getTemperature().getIcon());
                         break;
 
                     case FAHRENHEIT:
-                        daysInfoList.get(pos).setTemperature(new Celsius(view.getContext(), temperaturesCelsiusList[pos]));
+                        temp = new Celsius(view.getContext(), temperaturesCelsiusList[pos]);
+                        currDay.setTemperature(temp);
+                        ((FloatingActionButton) view).setImageDrawable(currDay.getTemperature().getIcon());
                         break;
 
                 }
