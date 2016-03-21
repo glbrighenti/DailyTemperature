@@ -12,7 +12,7 @@ import com.gbrighen.dailytemperature.temperatures.Celsius;
 import com.gbrighen.dailytemperature.temperatures.Fahrenheit;
 import com.gbrighen.dailytemperature.temperatures.ITemperature;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of Recycler view Adapter used for displaying CardView (each day of the week)
@@ -29,11 +29,11 @@ import java.util.ArrayList;
  */
 public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekViewHolder> {
 
-    private ArrayList<DayInfo> daysInfoList;
+    private List<DayInfo> daysInfoList;
     private float[] temperaturesCelsiusList;
     private float[] temperaturesFahrenheitList;
 
-    public WeekCardAdapter(ArrayList<DayInfo> info, float[] tempF, float[] tempC) {
+    public WeekCardAdapter(List<DayInfo> info, float[] tempF, float[] tempC) {
         this.daysInfoList = info;
         this.temperaturesCelsiusList = tempC;
         this.temperaturesFahrenheitList = tempF;
@@ -105,7 +105,7 @@ public class WeekCardAdapter extends RecyclerView.Adapter<WeekCardAdapter.WeekVi
         return daysInfoList.size();
     }
 
-    public void updateData(ArrayList<DayInfo> al, float[] tempF, float[] tempC) {
+    public void updateData(List<DayInfo> al, float[] tempF, float[] tempC) {
         this.daysInfoList = al;
         this.temperaturesCelsiusList = tempC;
         this.temperaturesFahrenheitList = tempF;

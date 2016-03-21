@@ -13,9 +13,9 @@ import android.support.v7.widget.Toolbar;
 
 import com.gbrighen.dailytemperature.temperatures.Celsius;
 import com.gbrighen.dailytemperature.temperatures.Fahrenheit;
-import com.gbrighen.dailytemperature.temperatures.ITemperature;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -47,7 +47,7 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
     private final int NUMBER_OF_CARDS = 6;
     private SensorManager sensorManager;
     private Sensor tempSensor;
-    private ArrayList<DayInfo> daysList;
+    private List<DayInfo> daysList;
     private float[] temperaturesCelsiusList;
     private float[] temperaturesFahrenheitList;
     private float oldSensorValue=Float.MIN_VALUE;
@@ -152,8 +152,8 @@ public class TemperatureActivity extends AppCompatActivity implements SensorEven
      *
      * @return a list of objects containing information for each day
      */
-    private ArrayList<DayInfo> createList() {
-        ArrayList<DayInfo> al = new ArrayList<DayInfo>();
+    private List<DayInfo> createList() {
+        List<DayInfo> al = new ArrayList<DayInfo>();
         String[] namesList = getResources().getStringArray(R.array.days_names_array);
         temperaturesCelsiusList = getRandomTemperature();
         temperaturesFahrenheitList = convertToFahrenheit(temperaturesCelsiusList); //Temperature conversion via NDK
